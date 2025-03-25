@@ -39,6 +39,7 @@ const options: EditorProps['options'] = {
     nonBasicASCII: false,
   },
   links: false,
+  useShadowDOM: true,
 };
 
 // const languageOptions = Object.entries(googleLanguages).map(([value, label]) => ({ value, label }));
