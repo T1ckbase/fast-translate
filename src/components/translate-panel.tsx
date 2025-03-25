@@ -29,7 +29,7 @@ const options: EditorProps['options'] = {
   overviewRulerBorder: false,
   lineNumbers: 'on',
   lineNumbersMinChars: 2,
-  scrollBeyondLastLine: false,
+  // scrollBeyondLastLine: false,
   wordWrap: 'on',
   automaticLayout: true,
   quickSuggestions: false,
