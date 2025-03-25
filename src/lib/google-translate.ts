@@ -269,14 +269,15 @@ export const googleLanguages = {
 export type GoogleLanguage = keyof typeof googleLanguages;
 
 export interface GoogleData {
-  src: string;
+  /* detect language */
+  src: Exclude<GoogleLanguage, 'auto'>;
   sentences: {
     trans: string;
     orig: string;
   }[];
 }
 
-export async function translate(text: string, sourceLang: GoogleLanguage, targetLang: GoogleLanguage): Promise<string> {
+export async function translate(text: string, sourceLang: GoogleLanguage, targetLang: GoogleLanguage, signal?: AbortSignal | null): Promise<GoogleData> {
   const params = {
     client: 'gtx',
     sl: sourceLang,
@@ -289,12 +290,10 @@ export async function translate(text: string, sourceLang: GoogleLanguage, target
 
   const url = 'https://translate.googleapis.com/translate_a/single?' + new URLSearchParams(params);
 
-  const res = await fetch(url);
+  const res = await fetch(url, { signal });
   if (!res.ok) throw new Error(`Failed to translate "${text}" (${sourceLang} -> ${targetLang})\n${res.status} ${res.statusText}`);
 
-  const data: GoogleData = await res.json();
-
-  return extractTranslatedText(data);
+  return await res.json();
 }
 
 export function extractTranslatedText(data: GoogleData): string {
@@ -302,25 +301,7 @@ export function extractTranslatedText(data: GoogleData): string {
   return data.sentences.map((s) => s.trans).join('');
 }
 
-export function isGoogleLanguage(lang: string | GoogleLanguage): lang is GoogleLanguage {
+export function isGoogleLanguage(lang: null | string | GoogleLanguage): lang is GoogleLanguage {
+  if (lang === null) return false;
   return Object.keys(googleLanguages).includes(lang);
 }
-
-// function formatTranslated(text: string, data: GoogleData) {
-//   for (const { orig, trans } of data.sentences) {
-//     text = text.replace(orig, trans);
-//   }
-//   return text;
-// }
-
-// function formatTranslated(data: GoogleData) {
-//   return data.sentences
-//     .map((s) => s?.trans)
-//     .filter(Boolean)
-//     .join('');
-// }
-
-// async function translate(text: string, sourceLang: GoogleLanguage, targetLang: GoogleLanguage): Promise<string> {
-//   const translated = await googleTranslate(text, sourceLang, targetLang);
-//   return formatTranslated(translated);
-// }
