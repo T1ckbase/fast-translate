@@ -14,7 +14,9 @@ function App() {
       <ThemeProvider defaultTheme='system' storageKey='theme'>
         <div className='container mx-auto flex h-svh max-h-svh max-w-7xl flex-col p-4 font-mono'>
           <header className='border-border mb-4 flex items-center justify-between border-b pb-4'>
-            <h1 className='flex items-center gap-2 text-2xl font-bold'>Fast Translate</h1>
+            <h1 className='flex items-center gap-2 text-2xl font-bold'>
+              <a href='https://t1ckbase.github.io/fast-translate'>Fast Translate</a>
+            </h1>
             <div className='flex items-center space-x-4'>
               <a href='https://github.com/T1ckbase/fast-translate' target='_blank' rel='noopener noreferrer'>
                 <Github className='h-5 w-5' />
