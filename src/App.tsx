@@ -12,7 +12,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme='system' storageKey='theme'>
-        <div className='container mx-auto flex h-svh max-h-svh max-w-[90rem] flex-col p-4 font-mono'>
+        <div className='container mx-auto flex h-svh max-h-svh max-w-[90rem] flex-col overflow-hidden p-4 font-mono'>
           <header className='border-border mb-4 flex items-center justify-between border-b pb-4'>
             <h1 className='flex items-center gap-2 text-2xl font-bold'>
               <a href='https://t1ckbase.github.io/fast-translate'>Fast Translate</a>
@@ -27,11 +27,7 @@ function App() {
             </div>
           </header>
 
-          {/* <main className='flex flex-grow flex-col'> */}
           <TranslatePanel />
-          {/* </main> */}
-
-          {/* <Button>TEST</Button> */}
         </div>
         <Toaster />
       </ThemeProvider>

@@ -96,7 +96,7 @@ export function TranslatePanel() {
   };
 
   return (
-    <div className='flex h-full flex-grow flex-col gap-4'>
+    <div className='flex flex-1 flex-col gap-4 overflow-hidden'>
       <div className='flex flex-wrap gap-4'>
         <div className='flex min-w-[20rem] flex-1 items-center gap-2'>
           <div className='flex-1'>
@@ -117,12 +117,12 @@ export function TranslatePanel() {
         </div>
       </div>
 
-      <div className='grid min-h-0 flex-1 grid-cols-1 gap-4 overflow-hidden lg:grid-cols-2'>
-        <div className='flex h-full min-h-0 flex-col'>
-          <Textarea value={sourceText} onChange={handleSourceTextChange} placeholder='Enter text to translate...' className='h-full min-h-[200px] resize-none focus-visible:ring-0' />
+      <div className='grid flex-1 grid-cols-1 gap-4 overflow-hidden lg:grid-cols-2'>
+        <div className='flex h-full flex-col overflow-hidden'>
+          <Textarea value={sourceText} onChange={handleSourceTextChange} placeholder='Enter text to translate...' className='h-full resize-none overflow-auto focus-visible:ring-0' />
         </div>
-        <div className='flex h-full min-h-0 flex-col'>
-          <Textarea value={targetText} readOnly className='h-full min-h-[200px] resize-none focus-visible:ring-0' />
+        <div className='flex h-full flex-col overflow-hidden'>
+          <Textarea value={targetText} readOnly className='h-full resize-none overflow-auto focus-visible:ring-0' />
         </div>
       </div>
     </div>
