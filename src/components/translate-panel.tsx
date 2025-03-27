@@ -4,7 +4,7 @@ import { Combobox } from '@/components/combobox';
 import { ArrowRightLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Theme, useTheme } from '@/components/theme-provider';
+// import { Theme, useTheme } from '@/components/theme-provider';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { CopyButton } from './copy-button';
@@ -14,7 +14,7 @@ export function TranslatePanel() {
   const sl = searchParams.get('sl');
   const tl = searchParams.get('tl');
 
-  const { theme } = useTheme();
+  // const { theme } = useTheme();
   const [sourceLanguage, setSourceLanguage] = useState<GoogleLanguage>(isGoogleLanguage(sl) ? sl : 'auto');
   const [targetLanguage, setTargetLanguage] = useState<Exclude<GoogleLanguage, 'auto'>>(isGoogleLanguage(tl) ? (tl as Exclude<GoogleLanguage, 'auto'>) : isGoogleLanguage(navigator.language) ? (navigator.language as Exclude<GoogleLanguage, 'auto'>) : 'en');
   const [sourceText, setSourceText] = useState(searchParams.get('text') || '');
