@@ -1,55 +1,14 @@
-import { useEffect, useRef, useState } from 'react';
-import { Editor, EditorProps, Monaco, OnMount } from '@monaco-editor/react';
+import { useEffect, useState } from 'react';
 import { extractTranslatedText, GoogleLanguage, googleLanguages, isGoogleLanguage, translate } from '@/lib/google-translate';
 import { Combobox } from '@/components/combobox';
 import { ArrowRightLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-// import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Textarea } from '@/components/ui/textarea';
 import { Theme, useTheme } from '@/components/theme-provider';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-// import { useMobile } from '@/hooks/use-mobile';
-// import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { CopyButton } from './copy-button';
 
-declare global {
-  interface Window {
-    monaco: Monaco;
-  }
-}
-
-const options: EditorProps['options'] = {
-  language: 'plaintext',
-  fontFamily: 'Geist Mono',
-  fontSize: 16,
-  minimap: { enabled: false },
-  padding: { top: 8, bottom: 8 },
-  renderLineHighlight: 'none',
-  occurrencesHighlight: 'off',
-  overviewRulerBorder: false,
-  lineNumbers: 'on',
-  lineNumbersMinChars: 2,
-  // scrollBeyondLastLine: false,
-  wordWrap: 'on',
-  automaticLayout: true,
-  quickSuggestions: false,
-  unicodeHighlight: {
-    ambiguousCharacters: false,
-    invisibleCharacters: false,
-    nonBasicASCII: false,
-  },
-  links: false,
-  useShadowDOM: true,
-};
-
-// const languageOptions = Object.entries(googleLanguages).map(([value, label]) => ({ value, label }));
-
-function getEditorTheme(theme: Theme) {
-  const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-  return theme === 'dark' ? 'vs-dark' : theme === 'system' ? (systemTheme === 'dark' ? 'vs-dark' : 'light') : 'light';
-}
-
-// TODO: Fix css
 export function TranslatePanel() {
   const searchParams = new URL(location.href).searchParams;
   const sl = searchParams.get('sl');
@@ -57,18 +16,11 @@ export function TranslatePanel() {
 
   const { theme } = useTheme();
   const [sourceLanguage, setSourceLanguage] = useState<GoogleLanguage>(isGoogleLanguage(sl) ? sl : 'auto');
-  // TODO: Fix type
   const [targetLanguage, setTargetLanguage] = useState<Exclude<GoogleLanguage, 'auto'>>(isGoogleLanguage(tl) ? (tl as Exclude<GoogleLanguage, 'auto'>) : isGoogleLanguage(navigator.language) ? (navigator.language as Exclude<GoogleLanguage, 'auto'>) : 'en');
   const [sourceText, setSourceText] = useState(searchParams.get('text') || '');
   const [targetText, setTargetText] = useState('');
   const [detectedLanguage, setDetectedLanguage] = useState<Exclude<GoogleLanguage, 'auto'>>();
   const queryClient = useQueryClient();
-  // const isMobile = useMobile();
-
-  const sourceEditorRef = useRef<Parameters<OnMount>[0]>(null);
-  const targetEditorRef = useRef<Parameters<OnMount>[0]>(null);
-  const sourceContainerRef = useRef(null);
-  const targetContainerRef = useRef(null);
 
   const languageOptions = Object.entries(googleLanguages).map(([value, label]) => ({ value, label: detectedLanguage && value === 'auto' ? `${googleLanguages[detectedLanguage] || detectedLanguage} - Detected` : label }));
 
@@ -118,35 +70,6 @@ export function TranslatePanel() {
     }
   }, [error]);
 
-  // Handle theme changes
-  useEffect(() => {
-    // Force Monaco editor to update when theme changes
-    const monaco = window.monaco;
-    if (!monaco) return;
-    monaco.editor.setTheme(getEditorTheme(theme));
-  }, [theme]);
-
-  // Set up resize observers for editor containers
-  useEffect(() => {
-    if (!sourceContainerRef.current || !targetContainerRef.current) return;
-
-    const resizeObserver = new ResizeObserver(() => {
-      if (sourceEditorRef.current) {
-        sourceEditorRef.current.layout();
-      }
-      if (targetEditorRef.current) {
-        targetEditorRef.current.layout();
-      }
-    });
-
-    resizeObserver.observe(sourceContainerRef.current);
-    resizeObserver.observe(targetContainerRef.current);
-
-    return () => {
-      resizeObserver.disconnect();
-    };
-  }, []);
-
   const handleSwapLanguages = () => {
     if (sourceLanguage === 'auto' && !detectedLanguage) return;
     setSourceLanguage(targetLanguage);
@@ -155,8 +78,9 @@ export function TranslatePanel() {
     setTargetText(sourceText);
   };
 
-  const handleSourceTextChange = (value: string | undefined) => {
-    setSourceText(value || '');
+  const handleSourceTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value;
+    setSourceText(value);
     if (!value) {
       setDetectedLanguage(undefined);
       setTargetText('');
@@ -167,7 +91,7 @@ export function TranslatePanel() {
     const url = new URL(location.href);
     url.searchParams.set('sl', sourceLanguage);
     url.searchParams.set('tl', targetLanguage);
-    url.searchParams.set('text', sourceText);
+    url.searchParams.set('text', value);
     history.replaceState(null, '', url.toString());
   };
 
@@ -195,32 +119,10 @@ export function TranslatePanel() {
 
       <div className='grid min-h-0 flex-1 grid-cols-1 gap-4 overflow-hidden lg:grid-cols-2'>
         <div className='flex h-full min-h-0 flex-col'>
-          <div ref={sourceContainerRef} className='min-h-0 flex-1 overflow-hidden rounded-md border'>
-            <Editor
-              height='100%'
-              theme={getEditorTheme(theme)}
-              value={sourceText}
-              onChange={handleSourceTextChange}
-              options={options}
-              onMount={(editor) => {
-                sourceEditorRef.current = editor;
-              }}
-              onValidate={(markers) => markers.forEach((marker) => console.log('onValidate:', marker.message))}
-            />
-          </div>
+          <Textarea value={sourceText} onChange={handleSourceTextChange} placeholder='Enter text to translate...' className='h-full min-h-[200px] resize-none focus-visible:ring-0' />
         </div>
         <div className='flex h-full min-h-0 flex-col'>
-          <div ref={targetContainerRef} className='min-h-0 flex-1 overflow-hidden rounded-md border'>
-            <Editor
-              height='100%'
-              theme={getEditorTheme(theme)}
-              value={targetText}
-              options={{ ...options, readOnly: true }}
-              onMount={(editor) => {
-                targetEditorRef.current = editor;
-              }}
-            />
-          </div>
+          <Textarea value={targetText} readOnly className='h-full min-h-[200px] resize-none focus-visible:ring-0' />
         </div>
       </div>
     </div>
