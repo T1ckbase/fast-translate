@@ -285,12 +285,19 @@ export async function translate(text: string, sourceLang: GoogleLanguage, target
     dt: 't',
     dj: '1',
     source: 'input',
-    q: text,
+    // q: text,
   };
 
   const url = 'https://translate.googleapis.com/translate_a/single?' + new URLSearchParams(params);
 
-  const res = await fetch(url, { signal });
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+    },
+    body: new URLSearchParams({ q: text }),
+    signal,
+  });
   if (!res.ok) throw new Error(`Failed to translate "${text}" (${sourceLang} -> ${targetLang})\n${res.status} ${res.statusText}`);
 
   return await res.json();
