@@ -1,15 +1,15 @@
 /*
 To generate:
-- Visit https://translate.google.com/?sl=auto&tl=en&op=translate
+- Visit https://translate.google.com/?sl=auto&tl=en&op=translate&hl=en
 - Open Language dropdown
 - Open Devtools and use the element picker to pick the root of the language picker
 - Right click on the element in devtools and click "Store as global variable"
 
 copy(Object.fromEntries(
-    Array.from(
-        temp1.querySelectorAll("[data-language-code]"),
-        e => [e.dataset.languageCode, e.children[1].textContent]
-    ).sort((a, b) => a[1] === "Detect language" ? -1 : b[1] === "Detect language" ? 1 : a[1].localeCompare(b[1]))
+  Array.from(
+    temp1.querySelectorAll("[data-language-code]"),
+    e => [e.dataset.languageCode, e.children[1].textContent]
+  ).sort((a, b) => a[1] === "Detect language" ? -1 : b[1] === "Detect language" ? 1 : a[1].localeCompare(b[1]))
 ))
 */
 

@@ -1,0 +1,36 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  container-type: inline-size;
+}
+
+body {
+  min-height: 100dvh;
+  display: grid;
+  grid-template-columns: min(100%, 80rem);
+  grid-template-rows: auto 1fr;
+  justify-content: center;
+  margin: 0;
+  padding: 1rem;
+  font-size: 1rem;
+
+  > header {
+    /* max-width: var(--max-width); */
+    /* margin-inline: auto; */
+    display: flex;
+    justify-content: space-between;
+    border-block-end: 1px solid #a0a0a0a0;
+
+    > nav {
+      /* padding-inline: 1rem; */
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1.5rem;
+    }
+  }
+}
