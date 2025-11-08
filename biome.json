@@ -9,11 +9,6 @@
     "ignoreUnknown": true,
     "includes": ["**", "!node_modules", "!dist"]
   },
-  "html": {
-    "formatter": {
-      "enabled": true
-    }
-  },
   "javascript": {
     "parser": {
       "jsxEverywhere": false
@@ -41,6 +36,7 @@
     "rules": {
       "recommended": true,
       "style": {
+        "noNonNullAssertion": "off",
         "useNodejsImportProtocol": "error"
       }
     }

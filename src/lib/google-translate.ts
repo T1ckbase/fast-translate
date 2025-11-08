@@ -268,47 +268,78 @@ export const googleLanguages = {
 
 export type GoogleLanguage = keyof typeof googleLanguages;
 
-export interface GoogleData {
-  /* detect language */
-  src: Exclude<GoogleLanguage, 'auto'>;
-  sentences: {
-    trans: string;
-    orig: string;
-  }[];
+export interface TranslationResult {
+  translation: string;
+  detectedLanguages: {
+    srclangs: GoogleLanguage[];
+    extendedSrclangs: GoogleLanguage[];
+  };
+  sourceLanguage: GoogleLanguage;
 }
 
-export async function translate(text: string, sourceLang: GoogleLanguage, targetLang: GoogleLanguage, signal?: AbortSignal | null): Promise<GoogleData> {
-  const params = {
-    client: 'gtx',
-    sl: sourceLang,
-    tl: targetLang,
-    dt: 't',
-    dj: '1',
-    source: 'input',
-    // q: text,
-  };
+// export interface TranslationResult {
+//   /* detect language */
+//   src: GoogleLanguage;
+//   sentences: {
+//     trans: string;
+//     orig: string;
+//   }[];
+// }
 
-  const url = 'https://translate.googleapis.com/translate_a/single?' + new URLSearchParams(params);
+export async function translate(sourceLang: GoogleLanguage, targetLang: GoogleLanguage, text: string, signal?: AbortSignal | null): Promise<TranslationResult> {
+  const params = new URLSearchParams({
+    'params.client': 'gtx',
+    dataTypes: 'TRANSLATION',
+    key: 'AIzaSyDLEeFI5OtFBwYBIoK_jj5m32rZK5CkCXA',
+    'query.sourceLanguage': sourceLang,
+    'query.targetLanguage': targetLang,
+    'query.text': text,
+  });
 
-  const res = await fetch(url, {
+  const res = await fetch('https://translate-pa.googleapis.com/v1/translate', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+      'x-http-method-override': 'GET',
     },
-    body: new URLSearchParams({ q: text }),
+    body: params,
     signal,
   });
-  if (!res.ok) throw new Error(`Failed to translate "${text}" (${sourceLang} -> ${targetLang})\n${res.status} ${res.statusText}`);
+  if (!res.ok) throw new Error(`Failed to translate (${sourceLang} -> ${targetLang})\n${res.status} ${res.statusText}`);
 
   return await res.json();
 }
 
-export function extractTranslatedText(data: GoogleData): string {
-  if (!data || !Array.isArray(data.sentences)) return '';
-  return data.sentences.map((s) => s.trans).join('');
-}
+// export async function translate(sourceLang: GoogleLanguage, targetLang: GoogleLanguage, text: string, signal?: AbortSignal | null): Promise<TranslationResult> {
+//   const params = {
+//     client: 'gtx',
+//     dt: 't',
+//     dj: '1',
+//     source: 'input',
+//     sl: sourceLang,
+//     tl: targetLang,
+//     q: text,
+//   };
 
-export function isGoogleLanguage(lang: null | string | GoogleLanguage): lang is GoogleLanguage {
+//   const res = await fetch('https://translate.googleapis.com/translate_a/single?', {
+//     method: 'POST',
+//     headers: {
+//       'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+//     },
+//     body: new URLSearchParams(params),
+//     signal,
+//   });
+//   if (!res.ok) throw new Error(`Failed to translate "${text}" (${sourceLang} -> ${targetLang})\n${res.status} ${res.statusText}`);
+
+//   return await res.json();
+// }
+
+// export function extractTranslatedText(data: TranslationResult): string {
+//   if (!data || !Array.isArray(data.sentences)) return '';
+//   return data.sentences.map((s) => s.trans).join('');
+// }
+
+export function isGoogleLanguage(lang: null | string): lang is GoogleLanguage {
   if (lang === null) return false;
   return Object.keys(googleLanguages).includes(lang);
 }
