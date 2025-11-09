@@ -14,10 +14,11 @@
     "moduleDetection": "force",
     "noEmit": true,
     "jsx": "react-jsx",
-    "jsxImportSource": "preact",
+    "jsxImportSource": "hono/jsx",
     "paths": {
-      "react": ["./node_modules/preact/compat/"],
-      "react-dom": ["./node_modules/preact/compat/"]
+      "react": ["./node_modules/hono/jsx/"],
+      "react/jsx-runtime": ["./node_modules/hono/jsx/jsx-runtime"]
+      // "use-sync-external-store/shim/index.js": ["./node_modules/hono/jsx/"]
     },
 
     /* Linting */

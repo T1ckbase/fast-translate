@@ -7,48 +7,10 @@
     <meta name="referrer" content="no-referrer">
     <meta name="title" content="Fast Translate">
     <meta name="description" content="A simple and fast Google Translate clone">
-    <meta name='generator' content="Bun 1.3.1" />
     <meta name="color-scheme" content="light dark">
     <title>Fast Translate</title>
     <link rel="stylesheet" href="./src/style.css">
-    <script src="./src/main.ts" type="module"></script>
+    <script src="./src/main.tsx" type="module"></script>
   </head>
-  <body>
-    <header>
-      <nav>
-        <a href="https://github.com/T1ckbase/fast-translate">Fast Translate</a>
-      </nav>
-    </header>
-    <main>
-      <div class="language-controls">
-        <div >
-          <select id="source-language">
-            <option value="auto">Detect language</option>
-          </select>
-        </div>
-        <div >
-          <button type="button" id="swap-languages" title="Swap languages">⇄</button>
-        </div>
-        <div >
-          <select id="target-language"></select>
-        </div>
-      </div>
-      <div class="translation-panels">
-        <div class="panel">
-          <div class="panel__toolbar">
-            <span id="detected-language"></span>
-            <button type="button" id="copy-source">Copy</button>
-          </div>
-          <textarea id="source-textarea" placeholder="Type to translate"  autocomplete="off"></textarea>
-        </div>
-        <div class="panel">
-          <div class="panel__toolbar">
-            <span id="status"></span>
-            <button type="button" id="copy-target">Copy</button>
-          </div>
-          <textarea id="target-textarea" readonly placeholder="Translation"  autocomplete="off"></textarea>
-        </div>
-      </div>
-    </main>
-  </body>
+  <body></body>
 </html>

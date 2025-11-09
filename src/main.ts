@@ -28,7 +28,7 @@ const tl = localStorage.getItem('tl');
 
 const sourceLanguage = localStorageSignal(signal(isGoogleLanguage(sl) ? sl : 'auto'), 'sl');
 const targetLanguage = localStorageSignal(signal(isGoogleLanguage(tl) ? tl : 'en'), 'tl');
-const sourceText = signal(localStorage.getItem('text') || '');
+const sourceText = signal(localStorage.getItem('text') ?? '');
 const debouncedSourceText = localStorageSignal(debounceSignal(sourceText, 500), 'text');
 const translationResult = signal<TranslationResult | null>(null);
 let start = performance.now();

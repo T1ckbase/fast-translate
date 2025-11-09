@@ -305,7 +305,12 @@ export async function translate(sourceLang: GoogleLanguage, targetLang: GoogleLa
     body: params,
     signal,
   });
-  if (!res.ok) throw new Error(`Failed to translate (${sourceLang} -> ${targetLang})\n${res.status} ${res.statusText}`);
+
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => null);
+    const errorMessage = errorData?.error?.message ? `\nError: ${errorData.error.message}` : '';
+    throw new Error(`Failed to translate (${sourceLang} -> ${targetLang})\n${res.status} ${res.statusText}, ${errorMessage}`);
+  }
 
   return await res.json();
 }
@@ -339,7 +344,7 @@ export async function translate(sourceLang: GoogleLanguage, targetLang: GoogleLa
 //   return data.sentences.map((s) => s.trans).join('');
 // }
 
-export function isGoogleLanguage(lang: null | string): lang is GoogleLanguage {
-  if (lang === null) return false;
+export function isGoogleLanguage(lang?: string | null): lang is GoogleLanguage {
+  if (!lang) return false;
   return Object.keys(googleLanguages).includes(lang);
 }

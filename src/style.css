@@ -7,7 +7,7 @@
 html {
   container-type: inline-size;
   /* Disable additional non-standard gestures such as double-tap to zoom */
-  /* touch-action: manipulation; */
+  touch-action: manipulation;
 }
 
 body {
@@ -17,10 +17,10 @@ body {
   grid-template-rows: auto 1fr;
   justify-content: center;
   margin: 0;
-  padding: 0.75rem;
+  padding: 0.5rem;
   font-size: 1rem;
   font-family: sans-serif;
-  font-variant-emoji: text;
+  /* font-variant-emoji: text; */
 
   > header {
     display: flex;
@@ -81,6 +81,38 @@ select {
 
   > div:nth-child(3) {
     justify-content: flex-start;
+  }
+}
+
+.copy-button {
+  display: inline-grid;
+  grid-template-areas: 'stack';
+  place-items: center;
+
+  > span {
+    transition: visibility 0s 1s;
+  }
+
+  > span:nth-child(1) {
+    grid-area: stack;
+    visibility: visible;
+  }
+
+  > span:nth-child(2) {
+    grid-area: stack;
+    visibility: hidden;
+  }
+
+  &:active > span {
+    transition-delay: 0s;
+  }
+
+  &:active > span:nth-child(1) {
+    visibility: hidden;
+  }
+
+  &:active > span:nth-child(2) {
+    visibility: visible;
   }
 }
 
