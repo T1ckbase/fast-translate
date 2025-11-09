@@ -30,5 +30,7 @@ export default defineConfig({
       },
     },
     sourcemap: true,
+    target: 'esnext',
+    cssTarget: 'esnext',
   },
 });

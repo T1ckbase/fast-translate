@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useMemo, useRef, useState } from 'hono/jsx';
+import { useCallback, useMemo, useRef, useState } from 'hono/jsx';
 import { useDebounce } from './hooks/use-debounce';
 import { useSaveToLocalStorage } from './hooks/use-save-to-local-storage';
 import { type GoogleLanguage, googleLanguages, isGoogleLanguage, translate } from './lib/google-translate';
@@ -23,32 +23,32 @@ export function App() {
 
   const queryClient = useQueryClient();
 
-  const handleSourceLanguageChange = (e: Event) => {
+  const handleSourceLanguageChange = useCallback((e: Event) => {
     const { value } = e.currentTarget as HTMLSelectElement;
     setSourceLanguage(value as GoogleLanguage);
-  };
+  }, []);
 
-  const handleTargetLanguageChange = (e: Event) => {
+  const handleTargetLanguageChange = useCallback((e: Event) => {
     const { value } = e.currentTarget as HTMLSelectElement;
     setTargetLanguage(value as GoogleLanguage);
-  };
+  }, []);
 
-  const handleTextInput = (e: Event) => {
+  const handleTextInput = useCallback((e: Event) => {
     const { value } = e.currentTarget as HTMLTextAreaElement;
     setText(value);
     queryClient.cancelQueries({ queryKey: ['translate'] });
-  };
+  }, []);
 
-  const handleSwapLanguageClick = () => {
+  const handleSwapLanguageClick = useCallback(() => {
     setSourceLanguage(targetLanguage);
     setTargetLanguage(sourceLanguage === 'auto' ? (data ? data.sourceLanguage : 'en') : sourceLanguage);
     if (targetTextareaRef.current) {
       setText(targetTextareaRef.current.value);
       targetTextareaRef.current.value = text;
     }
-  };
+  }, []);
 
-  const handleTextAreaScroll = (e: Event) => {
+  const handleTextAreaScroll = useCallback((e: Event) => {
     const source = sourceTextareaRef.current;
     const target = targetTextareaRef.current;
     if (!source || !target) return;
@@ -60,12 +60,12 @@ export function App() {
     const percentage = scrolling.scrollTop / (scrolling.scrollHeight - scrolling.clientHeight);
     const otherScrollTop = percentage * (other.scrollHeight - other.clientHeight);
     other.scrollTop = otherScrollTop;
-  };
+  }, []);
 
   const { data, error } = useQuery({
     queryKey: ['translate', debouncedText, sourceLanguage, targetLanguage],
     queryFn: async ({ signal }) => {
-      if (!debouncedText.trim()) return;
+      if (debouncedText.trim().length === 0) return;
       try {
         return await translate(sourceLanguage, targetLanguage, debouncedText, signal);
       } catch (error) {
@@ -76,7 +76,8 @@ export function App() {
         throw error;
       }
     },
-    enabled: Boolean(debouncedText.trim()),
+    enabled: debouncedText.trim().length > 0,
+    refetchOnWindowFocus: false,
     staleTime: 600000,
     gcTime: 600000,
   });
@@ -91,7 +92,7 @@ export function App() {
       <main>
         <div class='language-controls'>
           <div>
-            <select id='source-language' value={sourceLanguage} onChange={handleSourceLanguageChange}>
+            <select aria-label='source-language' value={sourceLanguage} onChange={handleSourceLanguageChange}>
               {useMemo(
                 () =>
                   Object.entries(googleLanguages).map(([value, label]) => (
@@ -109,7 +110,7 @@ export function App() {
             </button>
           </div>
           <div>
-            <select id='target-language' value={targetLanguage} onChange={handleTargetLanguageChange}>
+            <select aria-label='target-language' value={targetLanguage} onChange={handleTargetLanguageChange}>
               {useMemo(
                 () =>
                   Object.entries(googleLanguages)
