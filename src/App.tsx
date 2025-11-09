@@ -1,18 +1,11 @@
-import { QueryClient, QueryClientProvider, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useEffect, useMemo, useRef, useState } from 'hono/jsx';
-// import { useEffect, useRef, useState } from 'preact/compat';
-import useSWR from 'swr';
-import useSWRImmutable from 'swr/immutable';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMemo, useRef, useState } from 'hono/jsx';
 import { useDebounce } from './hooks/use-debounce';
 import { useSaveToLocalStorage } from './hooks/use-save-to-local-storage';
 import { type GoogleLanguage, googleLanguages, isGoogleLanguage, translate } from './lib/google-translate';
 
 const sl = localStorage.getItem('source-language');
 const tl = localStorage.getItem('target-language');
-
-const fetcher = async ([sourceLanguage, targetLanguage, text]: [GoogleLanguage, GoogleLanguage, string]) => {
-  return translate(sourceLanguage, targetLanguage, text);
-};
 
 export function App() {
   const [sourceLanguage, setSourceLanguage] = useState(isGoogleLanguage(sl) ? sl : 'auto');
@@ -69,11 +62,6 @@ export function App() {
     other.scrollTop = otherScrollTop;
   };
 
-  // const { data, error, isLoading } = useSWR(debouncedText ? [sourceLanguage, targetLanguage, debouncedText] : null, fetcher, {
-  //   // dedupingInterval: Infinity,
-  //   // keepPreviousData: true,
-  // });
-
   const { data, error } = useQuery({
     queryKey: ['translate', debouncedText, sourceLanguage, targetLanguage],
     queryFn: async ({ signal }) => {
@@ -92,13 +80,6 @@ export function App() {
     staleTime: 600000,
     gcTime: 600000,
   });
-
-  console.log({ sourceLanguage, targetLanguage, debouncedText });
-  console.log(targetTextareaRef.current, data);
-  // if (targetTextareaRef.current && data) {
-  //   targetTextareaRef.current.value = data.translation;
-  //   // setTranslated(data.translation);
-  // }
 
   return (
     <>
@@ -155,7 +136,6 @@ export function App() {
               </span>
               <button
                 type='button'
-                id='copy-source'
                 class='copy-button'
                 onClick={() => sourceTextareaRef.current && navigator.clipboard.writeText(sourceTextareaRef.current.value)}
               >
@@ -178,7 +158,7 @@ export function App() {
               <span id='status'>{error instanceof Error ? error.message : error}</span>
               <button
                 type='button'
-                id='copy-target'
+                class='copy-button'
                 onClick={() => targetTextareaRef.current && navigator.clipboard.writeText(targetTextareaRef.current.value)}
               >
                 <span>Copy</span>

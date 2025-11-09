@@ -17,7 +17,6 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.3.4",
-    "@types/bun": "latest",
     "vite": "npm:rolldown-vite@latest"
   }
 }

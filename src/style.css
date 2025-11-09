@@ -90,7 +90,7 @@ select {
   place-items: center;
 
   > span {
-    transition: visibility 0s 1s;
+    transition: visibility 0s 1.5s;
   }
 
   > span:nth-child(1) {

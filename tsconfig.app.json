@@ -18,7 +18,6 @@
     "paths": {
       "react": ["./node_modules/hono/jsx/"],
       "react/jsx-runtime": ["./node_modules/hono/jsx/jsx-runtime"]
-      // "use-sync-external-store/shim/index.js": ["./node_modules/hono/jsx/"]
     },
 
     /* Linting */
