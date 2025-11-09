@@ -50,6 +50,9 @@ button,
 input,
 textarea {
   font-size: inherit;
+  &:focus-visible {
+    outline: 1px solid light-dark(#333, #ddd);
+  }
 }
 
 select {

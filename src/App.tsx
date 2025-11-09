@@ -46,7 +46,7 @@ export function App() {
       setText(targetTextareaRef.current.value);
       targetTextareaRef.current.value = text;
     }
-  }, []);
+  }, [sourceLanguage, targetLanguage]);
 
   const handleTextAreaScroll = useCallback((e: Event) => {
     const source = sourceTextareaRef.current;
@@ -92,7 +92,7 @@ export function App() {
       <main>
         <div class='language-controls'>
           <div>
-            <select aria-label='source-language' value={sourceLanguage} onChange={handleSourceLanguageChange}>
+            <select aria-label='Source language' value={sourceLanguage} onChange={handleSourceLanguageChange}>
               {useMemo(
                 () =>
                   Object.entries(googleLanguages).map(([value, label]) => (
@@ -110,7 +110,7 @@ export function App() {
             </button>
           </div>
           <div>
-            <select aria-label='target-language' value={targetLanguage} onChange={handleTargetLanguageChange}>
+            <select aria-label='Target language' value={targetLanguage} onChange={handleTargetLanguageChange}>
               {useMemo(
                 () =>
                   Object.entries(googleLanguages)
@@ -149,6 +149,7 @@ export function App() {
               id='source-textarea'
               placeholder='Type to translate'
               autocomplete='off'
+              autofocus={true}
               value={text}
               onInput={handleTextInput}
               onScroll={handleTextAreaScroll}
