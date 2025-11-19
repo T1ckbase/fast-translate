@@ -1,5 +1,6 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useMemo, useRef, useState } from 'hono/jsx';
+import { DebouncedTextarea } from './components/debounced-textarea';
 import { useDebounce } from './hooks/use-debounce';
 import { useSaveToLocalStorage } from './hooks/use-save-to-local-storage';
 import { type GoogleLanguage, googleLanguages, isGoogleLanguage, translate } from './lib/google-translate';
@@ -11,6 +12,7 @@ export function App() {
   const [sourceLanguage, setSourceLanguage] = useState(isGoogleLanguage(sl) ? sl : 'auto');
   const [targetLanguage, setTargetLanguage] = useState(isGoogleLanguage(tl) ? tl : 'en');
   const [text, setText] = useState(localStorage.getItem('text') ?? '');
+  // const [debouncedText, setText] = useState(localStorage.getItem('text') ?? '');
   const debouncedText = useDebounce(text, 500);
 
   const sourceTextareaRef = useRef<HTMLTextAreaElement>(null);
@@ -39,12 +41,17 @@ export function App() {
     queryClient.cancelQueries({ queryKey: ['translate'] });
   }, []);
 
+  const handleDebouncedChange = useCallback((value: string) => {
+    setText(value);
+    queryClient.cancelQueries({ queryKey: ['translate'] });
+  }, []);
+
   const handleSwapLanguageClick = useCallback(() => {
     setSourceLanguage(targetLanguage);
     setTargetLanguage(sourceLanguage === 'auto' ? (data ? data.sourceLanguage : 'en') : sourceLanguage);
     if (targetTextareaRef.current) {
       setText(targetTextareaRef.current.value);
-      targetTextareaRef.current.value = text;
+      targetTextareaRef.current.value = debouncedText; // text;
     }
   }, [sourceLanguage, targetLanguage]);
 
@@ -154,6 +161,16 @@ export function App() {
               onInput={handleTextInput}
               onScroll={handleTextAreaScroll}
             ></textarea>
+            {/* <DebouncedTextarea
+              ref={sourceTextareaRef}
+              placeholder='Type to translate'
+              autocomplete='off'
+              autofocus={true}
+              value={debouncedText}
+              onScroll={handleTextAreaScroll}
+              onDebouncedChange={handleDebouncedChange}
+              delay={500}
+            /> */}
           </div>
           <div class='panel'>
             <div class='panel__toolbar'>
@@ -179,6 +196,12 @@ export function App() {
           </div>
         </div>
       </main>
+      {/* <button type='button' popovertarget='mypopover'>
+        Toggle the popover
+      </button>
+      <div id='mypopover' popover>
+        Popover content
+      </div> */}
     </>
   );
 }
