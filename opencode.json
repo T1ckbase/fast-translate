@@ -1,0 +1,13 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "Bun Docs": {
+      "type": "remote",
+      "url": "https://bun.com/docs/mcp"
+    },
+    "MDN Docs": {
+      "type": "remote",
+      "url": "https://mdn-mcp-0445ad8e765a.herokuapp.com/mcp"
+    }
+  }
+}
