@@ -1,5 +1,4 @@
 import { defineConfig } from 'vite';
-import solid from 'vite-plugin-solid';
 
 export default defineConfig({
   base: '/fast-translate/',
@@ -12,5 +11,4 @@ export default defineConfig({
       polyfill: false,
     },
   },
-  plugins: [solid()],
 });

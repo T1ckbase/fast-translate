@@ -10,8 +10,48 @@
     <meta name="google-site-verification" content="q_oFNZJdR5irDJRITMlBYMaT1WWHWhfpxTp1-4AlcIc">
     <meta name="color-scheme" content="light dark">
     <title>Fast Translate</title>
+    <style>
+      .copy-button > span:nth-child(2) {
+        visibility: hidden;
+      }
+    </style>
     <link rel="stylesheet" href="./src/style.css">
-    <script src="./src/main.tsx" type="module"></script>
+    <script src="./src/main.ts" type="module"></script>
   </head>
-  <body></body>
+  <body>
+    <main>
+      <div class="top-bar">
+        <h1 class="app-title">
+          <a class="app-link" href="https://github.com/T1ckbase/fast-translate" title="source code">Fast Translate</a>
+        </h1>
+        <div class="language-bar">
+          <select id="source-language" aria-label="Source language"></select>
+          <button type="button" id="swap-languages" title="Swap languages" aria-label="Swap languages">⇄</button>
+          <select id="target-language" aria-label="Target language"></select>
+        </div>
+      </div>
+      <div class="translation-grid">
+        <div class="panel">
+          <div class="panel-bar">
+            <span id="detected-language" aria-live="polite" aria-atomic="true"></span>
+            <button type="button" class="copy-button" id="copy-source-text" aria-label="Copy source text">
+              <span aria-hidden="true">Copy</span>
+              <span aria-hidden="true">Copied</span>
+            </button>
+          </div>
+          <textarea id="source-text" aria-label="Source text" placeholder="Type to translate" autocomplete="off" autofocus></textarea>
+        </div>
+        <div class="panel">
+          <div class="panel-bar">
+            <span id="translation-status" role="status" aria-live="polite" aria-atomic="true"></span>
+            <button type="button" class="copy-button" id="copy-target-text" aria-label="Copy translated text">
+              <span aria-hidden="true">Copy</span>
+              <span aria-hidden="true">Copied</span>
+            </button>
+          </div>
+          <textarea id="target-text" aria-label="Translated text" readonly placeholder="Translation" autocomplete="off"></textarea>
+        </div>
+      </div>
+    </main>
+  </body>
 </html>
