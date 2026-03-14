@@ -277,16 +277,12 @@ export interface TranslationResult {
   sourceLanguage: GoogleLanguage;
 }
 
-// export interface TranslationResult {
-//   /* detect language */
-//   src: GoogleLanguage;
-//   sentences: {
-//     trans: string;
-//     orig: string;
-//   }[];
-// }
-
-export async function translate(sourceLang: GoogleLanguage, targetLang: GoogleLanguage, text: string, signal?: AbortSignal | null): Promise<TranslationResult> {
+export async function translate(
+  sourceLang: GoogleLanguage,
+  targetLang: GoogleLanguage,
+  text: string,
+  signal?: AbortSignal | null,
+): Promise<TranslationResult> {
   const params = new URLSearchParams({
     'params.client': 'gtx',
     dataTypes: 'TRANSLATION',
@@ -296,6 +292,9 @@ export async function translate(sourceLang: GoogleLanguage, targetLang: GoogleLa
     'query.text': text,
   });
 
+  const timeoutSignal = AbortSignal.timeout(10000);
+  const combinedSignal = signal ? AbortSignal.any([signal, timeoutSignal]) : timeoutSignal;
+
   const res = await fetch('https://translate-pa.googleapis.com/v1/translate', {
     method: 'POST',
     headers: {
@@ -303,46 +302,15 @@ export async function translate(sourceLang: GoogleLanguage, targetLang: GoogleLa
       'x-http-method-override': 'GET',
     },
     body: params,
-    signal,
+    signal: combinedSignal,
   });
 
   if (!res.ok) {
-    const errorData = await res.json().catch(() => null);
-    const errorMessage = errorData?.error?.message ? `\nError: ${errorData.error.message}` : '';
-    throw new Error(`Failed to translate (${sourceLang} -> ${targetLang})\n${res.status} ${res.statusText}, ${errorMessage}`);
+    throw new Error(`Failed to translate (${sourceLang} -> ${targetLang}): ${res.status} ${res.statusText}`);
   }
 
-  return await res.json();
+  return res.json() as Promise<TranslationResult>;
 }
-
-// export async function translate(sourceLang: GoogleLanguage, targetLang: GoogleLanguage, text: string, signal?: AbortSignal | null): Promise<TranslationResult> {
-//   const params = {
-//     client: 'gtx',
-//     dt: 't',
-//     dj: '1',
-//     source: 'input',
-//     sl: sourceLang,
-//     tl: targetLang,
-//     q: text,
-//   };
-
-//   const res = await fetch('https://translate.googleapis.com/translate_a/single?', {
-//     method: 'POST',
-//     headers: {
-//       'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
-//     },
-//     body: new URLSearchParams(params),
-//     signal,
-//   });
-//   if (!res.ok) throw new Error(`Failed to translate "${text}" (${sourceLang} -> ${targetLang})\n${res.status} ${res.statusText}`);
-
-//   return await res.json();
-// }
-
-// export function extractTranslatedText(data: TranslationResult): string {
-//   if (!data || !Array.isArray(data.sentences)) return '';
-//   return data.sentences.map((s) => s.trans).join('');
-// }
 
 export function isGoogleLanguage(lang?: string | null): lang is GoogleLanguage {
   if (!lang) return false;

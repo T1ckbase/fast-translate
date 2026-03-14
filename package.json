@@ -1,22 +1,20 @@
 {
+  "$schema": "http://json.schemastore.org/package.json",
   "name": "fast-translate",
-  "homepage": "https://T1ckbase.github.io/fast-translate",
   "private": true,
-  "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "tsc -b && vite build",
     "preview": "vite preview",
     "lint": "biome check",
+    "lint:fix": "biome check --write",
     "format": "biome format --write"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.3.15",
-    "vite": "npm:rolldown-vite@latest"
-  },
-  "dependencies": {
-    "@tanstack/react-query": "^5.90.21",
-    "hono": "^4.11.9"
+    "@types/bun": "latest",
+    "@biomejs/biome": "^2.4.7",
+    "typescript": "^5.9.3",
+    "vite": "^8.0.0"
   }
 }

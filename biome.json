@@ -34,11 +34,14 @@
     "formatWithErrors": true,
     "indentStyle": "space",
     "lineEnding": "lf",
-    "lineWidth": 160
+    "lineWidth": 120
   },
   "linter": {
     "rules": {
       "recommended": true,
+      "a11y": {
+        "noAutofocus": "off"
+      },
       "style": {
         "noNonNullAssertion": "off",
         "useNodejsImportProtocol": "error"
