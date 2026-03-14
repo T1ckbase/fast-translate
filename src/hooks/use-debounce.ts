@@ -1,19 +1,17 @@
-import { type Accessor, createEffect, createSignal, onCleanup } from 'solid-js';
+import { useEffect, useState } from 'preact/hooks';
 
-export function useDebounce<T>(value: Accessor<T>, delay: number) {
-  const [debouncedValue, setDebouncedValue] = createSignal<T>(value());
+export function useDebounce<T>(value: T, delay: number) {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
 
-  createEffect(() => {
-    const nextValue = value();
-
+  useEffect(() => {
     const handler = setTimeout(() => {
-      setDebouncedValue(() => nextValue);
+      setDebouncedValue(value);
     }, delay);
 
-    onCleanup(() => {
+    return () => {
       clearTimeout(handler);
-    });
-  });
+    };
+  }, [delay, value]);
 
   return debouncedValue;
 }

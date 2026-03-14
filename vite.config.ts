@@ -1,5 +1,5 @@
 import { defineConfig } from 'vite';
-import solid from 'vite-plugin-solid';
+import preact from '@preact/preset-vite';
 
 export default defineConfig({
   base: '/fast-translate/',
@@ -12,5 +12,5 @@ export default defineConfig({
       polyfill: false,
     },
   },
-  plugins: [solid()],
+  plugins: [preact()],
 });

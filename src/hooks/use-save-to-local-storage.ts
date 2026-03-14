@@ -1,11 +1,11 @@
-import { createEffect } from 'solid-js';
+import { useEffect } from 'preact/hooks';
 
-export function useSaveToLocalStorage<T extends string>(key: string, value: () => T) {
-  createEffect(() => {
+export function useSaveToLocalStorage<T extends string>(key: string, value: T) {
+  useEffect(() => {
     try {
-      localStorage.setItem(key, value());
+      localStorage.setItem(key, value);
     } catch (e) {
       console.error(`Failed to set localStorage key "${key}"`, e);
     }
-  });
+  }, [key, value]);
 }

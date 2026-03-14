@@ -1,5 +1,5 @@
-import { useQuery, useQueryClient } from '@tanstack/solid-query';
-import { createMemo, createSignal, For } from 'solid-js';
+import { useQuery, useQueryClient } from '@tanstack/preact-query';
+import { useMemo, useRef, useState } from 'preact/hooks';
 import { useDebounce } from './hooks/use-debounce';
 import { useSaveToLocalStorage } from './hooks/use-save-to-local-storage';
 import { type GoogleLanguage, googleLanguages, isGoogleLanguage, translate } from './lib/google-translate';
@@ -7,46 +7,30 @@ import { type GoogleLanguage, googleLanguages, isGoogleLanguage, translate } fro
 const sl = localStorage.getItem('source-language');
 const tl = localStorage.getItem('target-language');
 
-export function App() {
-  const [sourceLanguage, setSourceLanguage] = createSignal<GoogleLanguage>(isGoogleLanguage(sl) ? sl : 'auto');
-  const [targetLanguage, setTargetLanguage] = createSignal<GoogleLanguage>(isGoogleLanguage(tl) ? tl : 'en');
-  const [text, setText] = createSignal(localStorage.getItem('text') ?? '');
+export default function App() {
+  const [sourceLanguage, setSourceLanguage] = useState<GoogleLanguage>(isGoogleLanguage(sl) ? sl : 'auto');
+  const [targetLanguage, setTargetLanguage] = useState<GoogleLanguage>(isGoogleLanguage(tl) ? tl : 'en');
+  const [text, setText] = useState(localStorage.getItem('text') ?? '');
   const debouncedText = useDebounce(text, 500);
 
-  let sourceTextareaRef: HTMLTextAreaElement | undefined;
-  let targetTextareaRef: HTMLTextAreaElement | undefined;
+  const sourceTextareaRef = useRef<HTMLTextAreaElement>(null);
+  const targetTextareaRef = useRef<HTMLTextAreaElement>(null);
 
   useSaveToLocalStorage('source-language', sourceLanguage);
   useSaveToLocalStorage('target-language', targetLanguage);
   useSaveToLocalStorage('text', debouncedText);
 
   const queryClient = useQueryClient();
-  const languageOptions = createMemo(() => Object.entries(googleLanguages));
-  const targetLanguageOptions = createMemo(() => languageOptions().filter(([lang]) => lang !== 'auto'));
+  const languageOptions = useMemo(() => Object.entries(googleLanguages), []);
+  const targetLanguageOptions = useMemo(() => languageOptions.filter(([lang]) => lang !== 'auto'), [languageOptions]);
 
-  const handleSourceLanguageChange = (e: Event) => {
-    const { value } = e.currentTarget as HTMLSelectElement;
-    setSourceLanguage(value as GoogleLanguage);
-  };
-
-  const handleTargetLanguageChange = (e: Event) => {
-    const { value } = e.currentTarget as HTMLSelectElement;
-    setTargetLanguage(value as GoogleLanguage);
-  };
-
-  const handleTextInput = (e: InputEvent) => {
-    const { value } = e.currentTarget as HTMLTextAreaElement;
-    setText(value);
-    queryClient.cancelQueries({ queryKey: ['translate'] });
-  };
-
-  const query = useQuery(() => ({
-    queryKey: ['translate', debouncedText(), sourceLanguage(), targetLanguage()],
+  const query = useQuery({
+    queryKey: ['translate', debouncedText, sourceLanguage, targetLanguage],
     queryFn: async ({ signal }) => {
-      if (debouncedText().trim().length === 0) return null;
+      if (debouncedText.trim().length === 0) return null;
 
       try {
-        return await translate(sourceLanguage(), targetLanguage(), debouncedText(), signal);
+        return await translate(sourceLanguage, targetLanguage, debouncedText, signal);
       } catch (error) {
         if (error instanceof Error && error.name === 'AbortError') {
           return null;
@@ -55,29 +39,29 @@ export function App() {
         throw error;
       }
     },
-    enabled: debouncedText().trim().length > 0,
+    enabled: debouncedText.trim().length > 0,
     refetchOnWindowFocus: false,
     staleTime: 600000,
     gcTime: 600000,
-  }));
+  });
 
-  const translation = createMemo(() => query.data ?? null);
+  const translation = query.data ?? null;
 
   const handleSwapLanguageClick = () => {
-    const nextSourceLanguage = targetLanguage();
-    const nextTargetLanguage = sourceLanguage() === 'auto' ? (translation()?.sourceLanguage ?? 'en') : sourceLanguage();
+    const nextSourceLanguage = targetLanguage;
+    const nextTargetLanguage = sourceLanguage === 'auto' ? (translation?.sourceLanguage ?? 'en') : sourceLanguage;
 
     setSourceLanguage(nextSourceLanguage);
     setTargetLanguage(nextTargetLanguage);
 
-    if (targetTextareaRef) {
-      setText(targetTextareaRef.value);
+    if (targetTextareaRef.current) {
+      setText(targetTextareaRef.current.value);
     }
   };
 
   const handleTextAreaScroll = (e: Event) => {
-    const source = sourceTextareaRef;
-    const target = targetTextareaRef;
+    const source = sourceTextareaRef.current;
+    const target = targetTextareaRef.current;
     if (!source || !target) return;
 
     const isSourceScrolling = e.currentTarget === source;
@@ -89,31 +73,21 @@ export function App() {
     other.scrollTop = otherScrollTop;
   };
 
-  const detectedLanguageLabel = createMemo(() => {
-    const result = translation();
+  const detectedLanguageLabel =
+    sourceLanguage !== 'auto' || !translation ? '' : `Detected: ${googleLanguages[translation.sourceLanguage] ?? translation.sourceLanguage}`;
 
-    if (sourceLanguage() !== 'auto' || !result) {
-      return '';
-    }
-
-    return `Detected: ${googleLanguages[result.sourceLanguage] ?? result.sourceLanguage}`;
-  });
-
-  const targetText = createMemo(() => translation()?.translation ?? '');
-  const statusMessage = createMemo(() => {
-    if (!query.error) return '';
-    return query.error instanceof Error ? query.error.message : String(query.error);
-  });
+  const targetText = translation?.translation ?? '';
+  const statusMessage = !query.error ? '' : query.error instanceof Error ? query.error.message : String(query.error);
 
   const copySourceText = async () => {
-    if (sourceTextareaRef) {
-      await navigator.clipboard.writeText(sourceTextareaRef.value);
+    if (sourceTextareaRef.current) {
+      await navigator.clipboard.writeText(sourceTextareaRef.current.value);
     }
   };
 
   const copyTargetText = async () => {
-    if (targetTextareaRef) {
-      await navigator.clipboard.writeText(targetTextareaRef.value);
+    if (targetTextareaRef.current) {
+      await navigator.clipboard.writeText(targetTextareaRef.current.value);
     }
   };
 
@@ -127,8 +101,10 @@ export function App() {
       <main>
         <div class='language-controls'>
           <div>
-            <select aria-label='Source language' value={sourceLanguage()} onChange={handleSourceLanguageChange}>
-              <For each={languageOptions()}>{([value, label]) => <option value={value}>{label}</option>}</For>
+            <select aria-label='Source language' value={sourceLanguage} onChange={(e) => setSourceLanguage(e.currentTarget.value as GoogleLanguage)}>
+              {languageOptions.map(([value, label]) => (
+                <option value={value}>{label}</option>
+              ))}
             </select>
           </div>
           <div>
@@ -137,46 +113,47 @@ export function App() {
             </button>
           </div>
           <div>
-            <select aria-label='Target language' value={targetLanguage()} onChange={handleTargetLanguageChange}>
-              <For each={targetLanguageOptions()}>{([value, label]) => <option value={value}>{label}</option>}</For>
+            <select aria-label='Target language' value={targetLanguage} onChange={(e) => setTargetLanguage(e.currentTarget.value as GoogleLanguage)}>
+              {targetLanguageOptions.map(([value, label]) => (
+                <option value={value}>{label}</option>
+              ))}
             </select>
           </div>
         </div>
         <div class='translation-panels'>
           <div class='panel'>
             <div class='panel__toolbar'>
-              <span id='detected-language'>{detectedLanguageLabel()}</span>
+              <span id='detected-language'>{detectedLanguageLabel}</span>
               <button type='button' class='copy-button' onClick={copySourceText}>
                 <span>Copy</span>
                 <span>Copied</span>
               </button>
             </div>
             <textarea
-              ref={(element) => {
-                sourceTextareaRef = element;
-              }}
+              ref={sourceTextareaRef}
               id='source-textarea'
               placeholder='Type to translate'
               autocomplete='off'
               autofocus
-              value={text()}
-              onInput={handleTextInput}
+              value={text}
+              onInput={(e) => {
+                setText(e.currentTarget.value);
+                queryClient.cancelQueries({ queryKey: ['translate'] });
+              }}
               onScroll={handleTextAreaScroll}
             />
           </div>
           <div class='panel'>
             <div class='panel__toolbar'>
-              <span id='status'>{statusMessage()}</span>
+              <span id='status'>{statusMessage}</span>
               <button type='button' class='copy-button' onClick={copyTargetText}>
                 <span>Copy</span>
                 <span>Copied</span>
               </button>
             </div>
             <textarea
-              ref={(element) => {
-                targetTextareaRef = element;
-              }}
-              value={targetText()}
+              ref={targetTextareaRef}
+              value={targetText}
               onScroll={handleTextAreaScroll}
               id='target-textarea'
               readOnly
