@@ -10,5 +10,6 @@ export default defineConfig({
     modulePreload: {
       polyfill: false,
     },
+    cssTarget: 'esnext',
   },
 });
