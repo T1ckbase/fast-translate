@@ -1,11 +1,11 @@
-import { useEffect } from 'hono/jsx';
+import { createEffect } from 'solid-js';
 
-export function useSaveToLocalStorage<T extends string>(key: string, value: T) {
-  useEffect(() => {
+export function useSaveToLocalStorage<T extends string>(key: string, value: () => T) {
+  createEffect(() => {
     try {
-      localStorage.setItem(key, value);
+      localStorage.setItem(key, value());
     } catch (e) {
       console.error(`Failed to set localStorage key "${key}"`, e);
     }
-  }, [key, value]);
+  });
 }

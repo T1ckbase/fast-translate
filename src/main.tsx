@@ -1,16 +1,15 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { StrictMode } from 'hono/jsx';
-import { render } from 'hono/jsx/dom';
+import { QueryClient } from '@tanstack/query-core';
+import { QueryClientProvider } from '@tanstack/solid-query';
+import { render } from 'solid-js/web';
 import { App } from './App';
 
 const queryClient = new QueryClient();
 
 render(
-  <StrictMode>
-    {/* @ts-ignore */}
+  () => (
     <QueryClientProvider client={queryClient}>
       <App />
     </QueryClientProvider>
-  </StrictMode>,
+  ),
   document.body,
 );

@@ -1,17 +1,19 @@
-import { useEffect, useState } from 'hono/jsx';
+import { type Accessor, createEffect, createSignal, onCleanup } from 'solid-js';
 
-export function useDebounce<T>(value: T, delay: number) {
-  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+export function useDebounce<T>(value: Accessor<T>, delay: number) {
+  const [debouncedValue, setDebouncedValue] = createSignal<T>(value());
 
-  useEffect(() => {
+  createEffect(() => {
+    const nextValue = value();
+
     const handler = setTimeout(() => {
-      setDebouncedValue(value);
+      setDebouncedValue(() => nextValue);
     }, delay);
 
-    return () => {
+    onCleanup(() => {
       clearTimeout(handler);
-    };
-  }, [value, delay]);
+    });
+  });
 
   return debouncedValue;
 }
