@@ -232,7 +232,9 @@ function applyTranslation(nextState: TranslationState) {
   translationState = nextState;
   targetTextarea.value = nextState.translation;
   detectedLanguageElement.textContent =
-    sourceLanguage === 'auto' ? `Detected: ${googleLanguages[nextState.sourceLanguage] ?? nextState.sourceLanguage}` : '';
+    sourceLanguage === 'auto'
+      ? `Detected: ${googleLanguages[nextState.sourceLanguage] ?? nextState.sourceLanguage}`
+      : '';
   syncScrollToFocusedTextarea();
 }
 
