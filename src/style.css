@@ -46,7 +46,7 @@ body {
 }
 
 :where(select, button, input, textarea) {
-  font-size: inherit;
+  font: inherit;
   &:focus-visible {
     outline: 1px solid light-dark(#333, #ddd);
   }
