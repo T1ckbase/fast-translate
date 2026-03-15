@@ -4,6 +4,9 @@
   "workspaces": {
     "": {
       "name": "fast-translate",
+      "dependencies": {
+        "@std/cache": "npm:@jsr/std__cache@^0.2.2",
+      },
       "devDependencies": {
         "@biomejs/biome": "^2.4.7",
         "@types/bun": "latest",
@@ -74,6 +77,8 @@
     "@rolldown/binding-win32-x64-msvc": ["@rolldown/binding-win32-x64-msvc@1.0.0-rc.9", "", { "os": "win32", "cpu": "x64" }, "sha512-G0oA4+w1iY5AGi5HcDTxWsoxF509hrFIPB2rduV5aDqS9FtDg1CAfa7V34qImbjfhIcA8C+RekocJZA96EarwQ=="],
 
     "@rolldown/pluginutils": ["@rolldown/pluginutils@1.0.0-rc.9", "", {}, "sha512-w6oiRWgEBl04QkFZgmW+jnU1EC9b57Oihi2ot3HNWIQRqgHp5PnYDia5iZ5FF7rpa4EQdiqMDXjlqKGXBhsoXw=="],
+
+    "@std/cache": ["@jsr/std__cache@0.2.2", "https://npm.jsr.io/~/11/@jsr/std__cache/0.2.2.tgz", {}, "sha512-f4G1hRFhN6IGO7HKIW9UsXmY3rTDbSUoDuDUVxLsIW39EpTkGCyp28cz3JYNEhldwsBd165nvhAHD61nnZgqKA=="],
 
     "@tybys/wasm-util": ["@tybys/wasm-util@0.10.1", "", { "dependencies": { "tslib": "^2.4.0" } }, "sha512-9tTaPJLSiejZKx+Bmog4uSubteqTvFrVrURwkmHixBo0G4seD0zUxp98E1DzUBJxLQ3NPwXrGKDiVjwx/DpPsg=="],
 

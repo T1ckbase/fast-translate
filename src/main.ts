@@ -1,3 +1,4 @@
+import { TtlCache } from '@std/cache/ttl-cache';
 import { type GoogleLanguage, googleLanguages, isGoogleLanguage, translate } from './lib/google-translate';
 
 type TranslationState = {
@@ -10,6 +11,8 @@ const STORAGE_KEYS = {
   targetLanguage: 'target-language',
   text: 'text',
 } as const;
+
+const CACHE_TTL_MS = 600000;
 
 const sourceLanguageSelect = getElement<HTMLSelectElement>('source-language');
 const targetLanguageSelect = getElement<HTMLSelectElement>('target-language');
@@ -32,7 +35,7 @@ let syncScrollLock = false;
 let debounceTimer: number | null = null;
 let activeRequestController: AbortController | null = null;
 
-const translationCache = new Map<string, TranslationState>();
+const translationCache = new TtlCache<string, TranslationState>(CACHE_TTL_MS);
 
 populateLanguageOptions(sourceLanguageSelect, Object.entries(googleLanguages), sourceLanguage);
 populateLanguageOptions(
