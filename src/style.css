@@ -53,7 +53,7 @@ body {
   font: inherit;
   &:focus-visible {
     outline: none;
-    border: 1px solid light-dark(#555, #bbb);
+    box-shadow: 0 0 0 2px #8886;
   }
 }
 
@@ -164,12 +164,28 @@ select {
       align-items: baseline;
     }
 
-    > textarea {
-      color: light-dark(#262626, #d4d4d4);
-      background: light-dark(#fff, #151515);
+    > .textarea-shell {
       flex-grow: 1;
-      resize: none;
-      padding-inline: 0.5rem;
+      min-block-size: 0;
+      overflow: hidden;
+      border: 1px solid #8888;
+      border-radius: 0.35rem;
+      background: light-dark(#fff, #151515);
+
+      &:focus-within {
+        box-shadow: 0 0 0 2px #8886;
+      }
+
+      > textarea {
+        color: light-dark(#262626, #d4d4d4);
+        background: transparent;
+        inline-size: 100%;
+        block-size: 100%;
+        border: 0;
+        flex-grow: 1;
+        resize: none;
+        padding: 0.5rem;
+      }
     }
   }
 }
