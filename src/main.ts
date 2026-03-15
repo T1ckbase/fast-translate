@@ -233,12 +233,58 @@ async function requestTranslation() {
 
 function applyTranslation(nextState: TranslationState) {
   translationState = nextState;
-  targetTextarea.value = nextState.translation;
+  targetTextarea.value = getDisplayTranslation(currentText, nextState.translation);
   detectedLanguageElement.textContent =
     sourceLanguage === 'auto'
       ? `Detected: ${googleLanguages[nextState.sourceLanguage] ?? nextState.sourceLanguage}`
       : '';
   syncScrollToFocusedTextarea();
+}
+
+function getDisplayTranslation(sourceText: string, translatedText: string) {
+  const sourceLines = sourceText.split(/\r?\n/);
+  const translatedLines = translatedText.split(/\r?\n/);
+  const processedLines: string[] = [];
+
+  let translatedIndex = 0;
+  let removedExtraBreaks = false;
+
+  for (const sourceLine of sourceLines) {
+    if (sourceLine.length === 0) {
+      if (translatedLines[translatedIndex] !== '') {
+        return translatedText;
+      }
+
+      processedLines.push('');
+      translatedIndex += 1;
+      continue;
+    }
+
+    while (translatedLines[translatedIndex] === '') {
+      translatedIndex += 1;
+      removedExtraBreaks = true;
+    }
+
+    const translatedLine = translatedLines[translatedIndex];
+
+    if (translatedLine === undefined) {
+      return translatedText;
+    }
+
+    processedLines.push(translatedLine);
+    translatedIndex += 1;
+  }
+
+  while (translatedLines[translatedIndex] === '') {
+    translatedIndex += 1;
+    removedExtraBreaks = true;
+  }
+
+  if (translatedIndex !== translatedLines.length || !removedExtraBreaks) {
+    return translatedText;
+  }
+
+  return processedLines.join('\n');
 }
 
 function cancelActiveRequest() {
